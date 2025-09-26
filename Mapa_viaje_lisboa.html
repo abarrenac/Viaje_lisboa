@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script>
+        L_NO_TOUCH = false;
+        L_DISABLE_3D = false;
+    </script>
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <style>
+        #map { height: 100%; width: 100%; }
+        .panel-custom {
+            position: fixed;
+            bottom: 30px; left: 30px; width: 320px;
+            background-color: white;
+            border: 2px solid #444;
+            border-radius: 10px;
+            z-index: 9999;
+        }
+        .panel-heading { cursor: pointer; }
+        .panel-body { font-size: 12pt; }
+    </style>
+</head>
+<body>
+<div class="panel-custom">
+  <div class="panel-heading" data-toggle="collapse" data-target="#panel-content">
+    <h4 style="margin:0; color:#2c3e50;">📒 Notas de viaje (click)</h4>
+  </div>
+  <div id="panel-content" class="panel-collapse collapse in">
+    <div class="panel-body">
+      <h5>🍴 Cosas que probar</h5>
+      <ul>
+        <li>Pastéis de Belém (obligatorio)</li>
+        <li>Bacalhau à Brás</li>
+        <li>Sardinhas assadas</li>
+        <li>Ginjinha (licor típico)</li>
+      </ul>
+      <h5>📍 Extras si hay tiempo</h5>
+      <ul>
+        <li>Elevador de Santa Justa</li>
+        <li>Barrio Alto</li>
+        <li>LX Factory</li>
+        <li>Oceanário de Lisboa</li>
+      </ul>
+      <h5>🍽️ Sitios para comer / tapear</h5>
+      <ul>
+        <li><b>Time Out Market</b> – Gran variedad de puestos locales</li>
+        <li><b>Casa da Índia</b> – Restaurante tradicional con buen bacalao</li>
+        <li><b>Cervejaria Ramiro</b> – Famoso por el marisco</li>
+        <li><b>Taberna da Rua das Flores</b> – Tapas modernas portuguesas</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="panel-custom" style="right:30px; left:auto; bottom:30px;">
+  <div class="panel-heading" data-toggle="collapse" data-target="#panel-distancias">
+    <h4 style="margin:0; color:#2c3e50;">📏 Distancias (click)</h4>
+  </div>
+  <div id="panel-distancias" class="panel-collapse collapse in">
+    <div class="panel-body">
+      <p><b>Belém (andando)</b></p>
+      <ul>
+        <li>Pastéis → Descubrimientos ≈ 500 m</li>
+        <li>Descubrimientos → Torre ≈ 1 km</li>
+      </ul>
+      <p><b>Lisboa centro (andando)</b></p>
+      <ul>
+        <li>Praça do Comércio → Alfama ≈ 900 m</li>
+        <li>Alfama → Mirador Santa Luzia ≈ 400 m</li>
+        <li>Santa Luzia → Mirador San Pedro Alcántara ≈ 1.4 km</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div id="map"></div>
+
+<script>
+    var map = L.map('map').setView([38.7169, -9.139], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // ---- Belém ----
+    var pasteis = L.marker([38.6972, -9.2034]).addTo(map).bindPopup("Pastéis de Belém");
+    var descubrimientos = L.marker([38.6935, -9.2057]).addTo(map).bindPopup("Monumento a los Descubrimientos");
+    var torre = L.marker([38.6916, -9.2159]).addTo(map).bindPopup("Torre de Belém");
+
+    // Routing Belém andando (sin panel de instrucciones)
+    L.Routing.control({
+        waypoints: [
+            L.latLng(38.6972, -9.2034),
+            L.latLng(38.6935, -9.2057),
+            L.latLng(38.6916, -9.2159)
+        ],
+        lineOptions: { styles: [{color: 'blue', opacity: 0.7, weight: 5}] },
+        createMarker: function() { return null; },
+        routeWhileDragging: false,
+        addWaypoints: false,
+        draggableWaypoints: false,
+        show: false,
+        createControl: false
+    }).addTo(map);
+
+    // ---- Parking en Lisboa Centro ----
+    var parking1 = L.marker([38.7079, -9.1366]).addTo(map).bindPopup("Parking Praça do Comércio (recomendado)");
+    var parking2 = L.marker([38.7161, -9.1406]).addTo(map).bindPopup("Parking Restauradores");
+    var parking3 = L.marker([38.715, -9.135]).addTo(map).bindPopup("Parking Martim Moniz");
+
+    // ---- Ruta andando Lisboa centro (sin panel de instrucciones) ----
+    var comercio = L.marker([38.7077, -9.1366]).addTo(map).bindPopup("Plaza del Comercio");
+    var alfama = L.marker([38.7139, -9.1306]).addTo(map).bindPopup("Alfama (paseo)");
+    var santaLuzia = L.marker([38.711, -9.1301]).addTo(map).bindPopup("Mirador de Santa Luzia");
+    var sanPedro = L.marker([38.7157, -9.1446]).addTo(map).bindPopup("Mirador de San Pedro de Alcántara");
+
+    L.Routing.control({
+        waypoints: [
+            L.latLng(38.7077, -9.1366),
+            L.latLng(38.7139, -9.1306),
+            L.latLng(38.711, -9.1301),
+            L.latLng(38.7157, -9.1446)
+        ],
+        lineOptions: { styles: [{color: 'red', opacity: 0.7, weight: 5}] },
+        createMarker: function() { return null; },
+        routeWhileDragging: false,
+        addWaypoints: false,
+        draggableWaypoints: false,
+        show: false,
+        createControl: false
+    }).addTo(map);
+</script>
+</body>
+</html>
